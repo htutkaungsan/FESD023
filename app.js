@@ -14,6 +14,7 @@
     }
   }
 
+  
   const mockCourses = [
     new OnlineCourse(1, 'Microsoft 365', 'Using software within the Microsoft 365 suite.', 30, 'Thida Mankongprasit', 'Basic', false, 'public/course1.png'),
     new OnlineCourse(2, 'Google Workspace', 'Utilizing the Google Workspace software suite.', 30, 'Bowornthat Nanthaphot', 'Basic', true, 'public/course2.png'),
