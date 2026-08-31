@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>SE-NCU Online</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
   </head>
   <body ng-controller="CourseController as vm">
@@ -42,6 +43,11 @@
         <a class="btn btn-outline-primary" href="#!/courses">All Courses</a>
       </div>
 
+      <div class="alert alert-success d-flex align-items-center gap-2" role="status" ng-if="vm.applicationMessage">
+        <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+        <span>{{ vm.applicationMessage }}</span>
+      </div>
+
       <div class="row g-4">
         <div class="col-12 col-md-6 col-lg-4" ng-repeat="course in vm.promotedCourses() track by course.courseId">
           <article class="card course-card h-100 shadow-sm">
@@ -50,10 +56,13 @@
               <span class="badge text-bg-primary align-self-start mb-2">{{ course.category }}</span>
               <h2 class="h5 card-title">{{ course.title }}</h2>
               <p class="card-text text-secondary flex-grow-1">{{ course.description }}</p>
-              <dl class="row small mb-0">
+              <dl class="row small mb-3">
                 <dt class="col-4">Lecturer</dt><dd class="col-8">{{ course.lecturer }}</dd>
                 <dt class="col-4">Duration</dt><dd class="col-8 mb-0">{{ course.duration }} hours</dd>
               </dl>
+              <button class="btn btn-primary w-100" type="button" ng-click="vm.applyCourse(course)" aria-label="Apply for {{ course.title }}">
+                <i class="bi bi-send-check me-1" aria-hidden="true"></i> Apply
+              </button>
             </div>
           </article>
         </div>
@@ -64,6 +73,11 @@
       <div class="mb-4">
         <p class="eyebrow mb-1">Course catalog</p>
         <h1 class="h3 mb-0">All Courses</h1>
+      </div>
+
+      <div class="alert alert-success d-flex align-items-center gap-2" role="status" ng-if="vm.applicationMessage">
+        <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+        <span>{{ vm.applicationMessage }}</span>
       </div>
 
       <div class="vstack gap-3">
@@ -84,6 +98,11 @@
                   <div class="col-sm-4"><strong>Duration:</strong> {{ course.duration }} hours</div>
                   <div class="col-sm-4"><strong>Category:</strong> {{ course.category }}</div>
                 </div>
+                <div class="mt-3 text-end">
+                  <button class="btn btn-primary" type="button" ng-click="vm.applyCourse(course)" aria-label="Apply for {{ course.title }}">
+                    <i class="bi bi-send-check me-1" aria-hidden="true"></i> Apply
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -97,14 +116,20 @@
         <h1 class="h3 mb-0">Course Management</h1>
       </div>
 
-      <div class="card shadow-sm mb-4">
-        <div class="card-header fw-semibold">Course Data</div>
+      <div class="card management-card shadow-sm">
+        <div class="card-header management-card-header d-flex align-items-center justify-content-between gap-3">
+          <div>
+            <h2 class="h6 fw-bold mb-1">Course Data</h2>
+            <p class="small text-secondary mb-0">Manage all available online courses.</p>
+          </div>
+          <span class="badge rounded-pill text-bg-light border">{{ vm.courses.length }} courses</span>
+        </div>
         <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
+          <table class="table course-table table-hover align-middle mb-0">
             <thead class="table-light">
               <tr>
                 <th scope="col">ID</th>
-                <th scope="col">Title</th>
+                <th scope="col">Course</th>
                 <th scope="col">Lecturer</th>
                 <th scope="col">Category</th>
                 <th scope="col">Hours</th>
@@ -114,25 +139,54 @@
             </thead>
             <tbody>
               <tr ng-repeat="course in vm.courses track by course.courseId" ng-class="{'table-primary': vm.form.courseId === course.courseId}">
-                <td>{{ course.courseId }}</td>
-                <td>{{ course.title }}</td>
-                <td>{{ course.lecturer }}</td>
-                <td>{{ course.category }}</td>
-                <td>{{ course.duration }}</td>
-                <td>{{ course.promote ? 'Yes' : 'No' }}</td>
-                <td class="text-end text-nowrap">
-                  <button class="btn btn-sm btn-outline-primary" type="button" ng-click="vm.editCourse(course)">Edit</button>
-                  <button class="btn btn-sm btn-outline-danger" type="button" ng-click="vm.deleteCourse(course.courseId)">Delete</button>
+                <td><span class="course-id">#{{ course.courseId }}</span></td>
+                <td>
+                  <div class="d-flex align-items-center gap-3 course-cell">
+                    <img class="course-thumb" ng-src="{{ course.courseImage }}" alt="">
+                    <div>
+                      <div class="fw-semibold">{{ course.title }}</div>
+                      <div class="small text-secondary course-description">{{ course.description }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="lecturer-cell">{{ course.lecturer }}</td>
+                <td><span class="badge category-badge">{{ course.category }}</span></td>
+                <td><span class="text-nowrap">{{ course.duration }} hrs</span></td>
+                <td>
+                  <span class="badge rounded-pill" ng-class="course.promote ? 'text-bg-success' : 'text-bg-secondary'">
+                    {{ course.promote ? 'Yes' : 'No' }}
+                  </span>
+                </td>
+                <td class="text-end text-nowrap action-cell">
+                  <button class="btn btn-sm btn-outline-primary" type="button" ng-click="vm.editCourse(course)" aria-label="Edit {{ course.title }}">
+                    <i class="bi bi-pencil-square" aria-hidden="true"></i><span class="action-label"> Edit</span>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger" type="button" ng-click="vm.deleteCourse(course.courseId)" aria-label="Delete {{ course.title }}">
+                    <i class="bi bi-trash3" aria-hidden="true"></i><span class="action-label"> Delete</span>
+                  </button>
                 </td>
               </tr>
               <tr ng-if="!vm.courses.length"><td colspan="7" class="text-center text-secondary py-4">No courses available.</td></tr>
             </tbody>
           </table>
         </div>
+        <div class="card-footer bg-white border-top-0 d-flex justify-content-end p-3">
+          <button class="btn btn-primary" type="button" ng-click="vm.openAddForm()" ng-if="!vm.formVisible">
+            <i class="bi bi-plus-circle me-1" aria-hidden="true"></i> Add Course
+          </button>
+        </div>
       </div>
 
-      <form class="card shadow-sm" name="courseForm" ng-submit="vm.saveCourse(courseForm)" novalidate>
-        <div class="card-header fw-semibold">{{ vm.isEditing() ? 'Update Course' : 'Add Course' }}</div>
+      <div class="alert alert-success mt-3 mb-0" role="status" ng-if="vm.message">{{ vm.message }}</div>
+
+      <form id="course-form" class="card course-form-card shadow-sm mt-4" name="courseForm" ng-submit="vm.saveCourse(courseForm)" ng-if="vm.formVisible" novalidate>
+        <div class="card-header d-flex align-items-center justify-content-between gap-3">
+          <div>
+            <h2 class="h6 fw-bold mb-1">{{ vm.isEditing() ? 'Update Course' : 'Add Course' }}</h2>
+            <p class="small text-secondary mb-0">{{ vm.isEditing() ? 'Edit the selected course information.' : 'Enter the new course information.' }}</p>
+          </div>
+          <button class="btn-close" type="button" ng-click="vm.closeForm(courseForm)" aria-label="Close form"></button>
+        </div>
         <div class="card-body">
           <div class="row g-3">
             <div class="col-md-6">
@@ -174,13 +228,14 @@
             </div>
           </div>
         </div>
-        <div class="card-footer d-flex gap-2">
-          <button class="btn btn-primary" type="submit">{{ vm.isEditing() ? 'Update' : 'Add' }}</button>
-          <button class="btn btn-outline-secondary" type="button" ng-click="vm.resetForm(courseForm)">Clear</button>
+        <div class="card-footer bg-light d-flex justify-content-end gap-2">
+          <button class="btn btn-outline-secondary" type="button" ng-click="vm.closeForm(courseForm)">Cancel</button>
+          <button class="btn btn-primary" type="submit">
+            <i class="bi" ng-class="vm.isEditing() ? 'bi-check-circle' : 'bi-plus-circle'" aria-hidden="true"></i>
+            {{ vm.isEditing() ? 'Update' : 'Add' }}
+          </button>
         </div>
       </form>
-
-      <div class="alert alert-success mt-3" role="status" ng-if="vm.message">{{ vm.message }}</div>
     </script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>

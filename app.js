@@ -36,7 +36,8 @@
       .otherwise({ redirectTo: '/' });
   }
 
-  function CourseController() {
+  CourseController.$inject = ['$timeout'];
+  function CourseController($timeout) {
     const vm = this;
 
     vm.courses = mockCourses.slice();
@@ -45,19 +46,34 @@
       return { label: 'Course image ' + number, path: 'public/course' + number + '.png' };
     });
     vm.form = emptyCourse();
+    vm.formVisible = false;
     vm.message = '';
+    vm.applicationMessage = '';
 
     vm.promotedCourses = function () {
       return vm.courses.filter(function (course) { return course.promote; });
+    };
+
+    vm.applyCourse = function (course) {
+      vm.applicationMessage = 'You have selected "' + course.title + '" for application.';
     };
 
     vm.isEditing = function () {
       return vm.form.courseId !== null;
     };
 
+    vm.openAddForm = function () {
+      vm.form = emptyCourse();
+      vm.formVisible = true;
+      vm.message = '';
+      focusForm();
+    };
+
     vm.editCourse = function (course) {
       vm.form = angular.copy(course);
-      vm.message = 'Editing course ' + course.courseId + '.';
+      vm.formVisible = true;
+      vm.message = '';
+      focusForm();
     };
 
     vm.saveCourse = function (form) {
@@ -91,6 +107,7 @@
       }
 
       vm.form = emptyCourse();
+      vm.formVisible = false;
       form.$setPristine();
       form.$setUntouched();
     };
@@ -100,13 +117,16 @@
       if (!course || !window.confirm('Delete "' + course.title + '"?')) return;
 
       vm.courses = vm.courses.filter(function (item) { return item.courseId !== courseId; });
-      if (vm.form.courseId === courseId) vm.form = emptyCourse();
+      if (vm.form.courseId === courseId) {
+        vm.form = emptyCourse();
+        vm.formVisible = false;
+      }
       vm.message = 'Course deleted successfully.';
     };
 
-    vm.resetForm = function (form) {
+    vm.closeForm = function (form) {
       vm.form = emptyCourse();
-      vm.message = '';
+      vm.formVisible = false;
       if (form) {
         form.$setPristine();
         form.$setUntouched();
@@ -115,6 +135,13 @@
 
     function nextCourseId() {
       return vm.courses.length ? Math.max.apply(null, vm.courses.map(function (course) { return course.courseId; })) + 1 : 1;
+    }
+
+    function focusForm() {
+      $timeout(function () {
+        const formElement = document.getElementById('course-form');
+        if (formElement) formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
     }
 
     function emptyCourse() {
