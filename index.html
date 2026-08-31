@@ -64,7 +64,7 @@
                 <div><i class="bi bi-person me-1" aria-hidden="true"></i>{{ course.lecturer }}</div>
                 <div><i class="bi bi-clock me-1" aria-hidden="true"></i>{{ course.duration }} hours</div>
               </div>
-              <button class="btn btn-sm btn-primary mt-3 align-self-start" type="button" ng-click="vm.applyCourse(course)" aria-label="Apply for {{ course.title }}">
+              <button class="btn btn-primary featured-apply-button mt-3" type="button" ng-click="vm.applyCourse(course)" aria-label="Apply for {{ course.title }}">
                 <i class="bi bi-send-check me-1" aria-hidden="true"></i> Apply
               </button>
             </div>
@@ -103,7 +103,7 @@
                   <span class="badge category-badge">{{ course.category }}</span>
                 </div>
                 <div class="mt-2 text-end">
-                  <button class="btn btn-sm btn-primary" type="button" ng-click="vm.applyCourse(course)" aria-label="Apply for {{ course.title }}">
+                  <button class="btn btn-sm btn-primary list-apply-button" type="button" ng-click="vm.applyCourse(course)" aria-label="Apply for {{ course.title }}">
                     <i class="bi bi-send-check me-1" aria-hidden="true"></i> Apply
                   </button>
                 </div>

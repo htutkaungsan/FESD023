@@ -79,6 +79,11 @@ body {
   gap: 0.3rem;
 }
 
+.featured-apply-button {
+  padding: 0.55rem 0.9rem;
+  width: 100%;
+}
+
 .course-list-card {
   overflow: hidden;
 }
@@ -105,6 +110,11 @@ body {
 
 .course-list-body {
   min-height: 126px;
+}
+
+.list-apply-button {
+  min-width: 132px;
+  padding: 0.4rem 1rem;
 }
 
 .min-width-0 {
